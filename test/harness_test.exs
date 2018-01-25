@@ -3,10 +3,12 @@ defmodule HarnessTest do
   def equal(a, b), do: a === b
   @cm CompleteMe
 
+  @tag :skip
   test "starting_count" do
     assert @cm.count() === 0
   end
 
+  @tag :skip
   test "inserts_single_word" do
     @cm.insert("pizza")
     |> @cm.count()
@@ -14,6 +16,7 @@ defmodule HarnessTest do
     |> assert
   end
 
+  @tag :skip
   test "inserts_multiple_words" do
     @cm.populate("pizza\ndog\ncat")
     |> @cm.count()
@@ -21,6 +24,7 @@ defmodule HarnessTest do
     |> assert
   end
 
+  @tag :skip
   test "counts_inserted_words" do
     insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
     |> @cm.count()
@@ -28,6 +32,7 @@ defmodule HarnessTest do
     |> assert
   end
 
+  @tag :skip
   test "suggests_off_of_small_dataset" do
     trie =
       insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
@@ -52,6 +57,7 @@ defmodule HarnessTest do
     |> assert
   end
 
+  @tag :skip
   test "inserts_medium_dataset" do
     with {:ok, word_list} <- medium_word_list(),
          word_trie <- @cm.populate(word_list),
@@ -64,6 +70,7 @@ defmodule HarnessTest do
     end
   end
 
+  @tag :skip
   test "suggests_off_of_medium_dataset" do
     with {:ok, word_list} <- medium_word_list(),
          word_trie <- @cm.populate(word_list) do
@@ -76,6 +83,7 @@ defmodule HarnessTest do
     end
   end
 
+  @tag :skip
   test "selects_off_of_medium_dataset" do
     with {:ok, word_list} <- medium_word_list(),
          word_trie <- @cm.populate(word_list) do
@@ -88,6 +96,7 @@ defmodule HarnessTest do
     end
   end
 
+  @tag :skip
   test "works_with_large_dataset" do
     with {:ok, word_list} <- large_word_list(),
          word_trie <- @cm.populate(word_list) do

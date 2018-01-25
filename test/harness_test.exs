@@ -1,5 +1,3 @@
-require IEx;
-
 defmodule HarnessTest do
   use ExUnit.Case
   def equal(a, b), do: a === b
@@ -8,119 +6,118 @@ defmodule HarnessTest do
   test "starting_count" do
     assert @cm.count() === 0
   end
-  
+
   test "inserts_single_word" do
     @cm.insert("pizza")
-      |> @cm.count()
-      |> equal(1)
-      |> assert
+    |> @cm.count()
+    |> equal(1)
+    |> assert
   end
 
   test "inserts_multiple_words" do
     @cm.populate("pizza\ndog\ncat")
-      |> @cm.count()
-      |> equal(3)
-      |> assert
+    |> @cm.count()
+    |> equal(3)
+    |> assert
   end
 
   test "counts_inserted_words" do
     insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
-      |> @cm.count()
-      |> equal(5)
-      |> assert
+    |> @cm.count()
+    |> equal(5)
+    |> assert
   end
 
   test "suggests_off_of_small_dataset" do
-    trie = insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
+    trie =
+      insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
       |> @cm.suggest("p")
       |> equal(["pizza"])
       |> assert
 
     @cm.suggest(trie, "piz")
-      |> equal(["pizza"])
-      |> assert
+    |> equal(["pizza"])
+    |> assert
 
     @cm.suggest(trie, "zo")
-      |> equal(["zombies"])
-      |> assert
+    |> equal(["zombies"])
+    |> assert
 
     @cm.suggest(trie, "a")
-      |> equal(["a", "aardvark"])
-      |> assert
+    |> equal(["a", "aardvark"])
+    |> assert
 
     @cm.suggest(trie, "aa")
-      |> equal(["aardvark"])
-      |> assert
+    |> equal(["aardvark"])
+    |> assert
   end
 
   test "inserts_medium_dataset" do
-    with { :ok, word_list} <- medium_word_list(),
+    with {:ok, word_list} <- medium_word_list(),
          word_trie <- @cm.populate(word_list),
-         word_count <- String.split(word_list, "\n")
-    do
+         word_count <- String.split(word_list, "\n") do
       @cm.count(word_trie)
-        |> equal(word_count)
-        |> assert
+      |> equal(word_count)
+      |> assert
     else
       e -> assert false, e
     end
   end
 
   test "suggests_off_of_medium_dataset" do
-    with { :ok, word_list} <- medium_word_list(),
-         word_trie <- @cm.populate(word_list)
-    do
+    with {:ok, word_list} <- medium_word_list(),
+         word_trie <- @cm.populate(word_list) do
       @cm.suggest(word_trie, "wi")
-        |> List.sort
-        |> equal(["williwaw", "wizardly"])
-        |> assert
+      |> List.sort()
+      |> equal(["williwaw", "wizardly"])
+      |> assert
     else
       e -> assert false, e
     end
   end
 
   test "selects_off_of_medium_dataset" do
-    with { :ok, word_list} <- medium_word_list(),
-         word_trie <- @cm.populate(word_list)
-    do
+    with {:ok, word_list} <- medium_word_list(),
+         word_trie <- @cm.populate(word_list) do
       @cm.select(word_trie, "wi", "wizardly")
-        |> @cm.suggest("wi")
-        |> equal(["wizardly", "williwaw"])
-        |> assert
+      |> @cm.suggest("wi")
+      |> equal(["wizardly", "williwaw"])
+      |> assert
     else
       e -> assert false, e
     end
   end
 
   test "works_with_large_dataset" do
-    with { :ok, word_list} <- large_word_list(),
-         word_trie <- @cm.populate(word_list)
-    do
-      suggestions = ["doggerel", 
-                     "doggereler", 
-                     "doggerelism", 
-                     "doggerelist", 
-                     "doggerelize", 
-                     "doggerelizer"]
+    with {:ok, word_list} <- large_word_list(),
+         word_trie <- @cm.populate(word_list) do
+      suggestions = [
+        "doggerel",
+        "doggereler",
+        "doggerelism",
+        "doggerelist",
+        "doggerelize",
+        "doggerelizer"
+      ]
 
       @cm.suggest(word_trie, "doggerel")
-        |> List.sort
-        |> equal(suggestions)
-        |> assert
+      |> List.sort()
+      |> equal(suggestions)
+      |> assert
 
       @cm.select(word_trie, "doggerel", "doggerelist")
-        |> @cm.suggest("doggerel")
-        |> List.first
-        |> equal("doggerelist")
-        |> assert
+      |> @cm.suggest("doggerel")
+      |> List.first()
+      |> equal("doggerelist")
+      |> assert
     else
       e -> assert false, e
     end
   end
 
   def insert_words(words) do
-    Enum.join(words, "\n") 
-      |> @cm.populate()
+    Enum.join(words, "\n")
+    |> @cm.populate()
   end
 
   def medium_word_list do

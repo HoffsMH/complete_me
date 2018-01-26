@@ -1,0 +1,7 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+TriePopulateBench	Large List Naive		1	1280500
+TriePopulateBench	Large List two		1	8413892
+TriePopulateBench	Medium List Naive		500	2371013
+TriePopulateBench	Medium List two		100	2644739
+TriePopulateBench	hello list		500000	1971521

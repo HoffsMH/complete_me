@@ -1,0 +1,4 @@
+duration:1.0;mem stats:false;sys mem stats:false
+module;test;tags;iterations;elapsed
+TriePopulateBench	asdf		500	2121800
+TriePopulateBench	hello list		500000	1992508

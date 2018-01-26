@@ -1,3 +1,2 @@
 defmodule CompleteMe do
-
 end

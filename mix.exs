@@ -21,7 +21,8 @@ defmodule CompleteMe.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false}
+      {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
+      {:benchfella, "~> 0.3.5"}
     ]
   end
 end

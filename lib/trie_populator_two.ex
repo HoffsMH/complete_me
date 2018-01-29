@@ -7,7 +7,7 @@ defmodule TriePopulatorTwo do
   def populate(word_list) when is_list(word_list) do
     word_list
     |> pmap(&@ti.insert/1)
-    |> Enum.reduce(%{},&@tm.merge/2)
+    |> Enum.reduce(%{}, &@tm.merge/2)
   end
 
   def populate(words_text) when is_binary(words_text) do
@@ -17,7 +17,7 @@ defmodule TriePopulatorTwo do
 
   def pmap(collection, func) do
     collection
-    |> Enum.map(&(Task.async(fn -> func.(&1) end)))
+    |> Enum.map(&Task.async(fn -> func.(&1) end))
     |> Enum.map(&Task.await/1)
   end
 end

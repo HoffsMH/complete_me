@@ -1,5 +1,5 @@
 defmodule HarnessTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   def equal(a, b), do: a === b
   @cm CompleteMe
 

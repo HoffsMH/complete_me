@@ -23,28 +23,27 @@ defmodule TriePopulatorTest do
   end
 
   test "populate with a\nb" do
-    expected = %{a: %{ value: "a" }, b: %{value: "b"}}
+    expected = %{a: %{value: "a"}, b: %{value: "b"}}
 
     assert @tp.populate("a\nb") === expected
   end
 
   test "populate with [a,b]" do
-    expected = %{a: %{ value: "a" }, b: %{value: "b"}}
+    expected = %{a: %{value: "a"}, b: %{value: "b"}}
 
     assert @tp.populate(["a", "b"]) === expected
   end
 
   test "populate with medium word list" do
-    with {:ok, medium_text} <- medium_word_list()
-    do
+    with {:ok, medium_text} <- medium_word_list() do
       trie = @tp.populate(medium_text)
-      
+
       result = trie[:v][:e][:t][:u][:s][:t][:value]
-      
+
       assert result === "vetust"
 
       result = trie[:f][:a][:s][:t][:h][:o][:l][:d][:value]
-      
+
       assert result === "fasthold"
     end
   end

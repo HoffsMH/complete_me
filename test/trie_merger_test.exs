@@ -7,7 +7,7 @@ defmodule TrieMergerTest do
   end
 
   test "merge with a single trie" do
-    trie = %{specific: %{ value: "trie"}}
+    trie = %{specific: %{value: "trie"}}
     assert @tm.merge(trie) === trie
   end
 
@@ -20,18 +20,19 @@ defmodule TrieMergerTest do
 
   test "merge with a double trie" do
     trie_one = %{
-      d: %{ value: "d"},
-      a: %{ b: %{ value: "ab"}}
+      d: %{value: "d"},
+      a: %{b: %{value: "ab"}}
     }
+
     trie_two = %{
-      e: %{ a: %{ value: "ea"}},
-      a: %{ f: %{ value: "af"}, b: %{ d: %{ value: "abd"}}}
+      e: %{a: %{value: "ea"}},
+      a: %{f: %{value: "af"}, b: %{d: %{value: "abd"}}}
     }
 
     expected = %{
-      d: %{ value: "d"},
-      e: %{ a: %{ value: "ea"}},
-      a: %{ f: %{ value: "af" }, b: %{ value: "ab", d: %{ value: "abd"}}}
+      d: %{value: "d"},
+      e: %{a: %{value: "ea"}},
+      a: %{f: %{value: "af"}, b: %{value: "ab", d: %{value: "abd"}}}
     }
 
     assert @tm.merge(trie_one, trie_two) === expected

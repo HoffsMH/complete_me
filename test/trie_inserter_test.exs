@@ -54,17 +54,17 @@ defmodule TrieInserterTest do
 
   test "insert with medium word list" do
     with {:ok, medium_text} <- medium_word_list(),
-         word_list <- String.split(medium_text, "\n") 
-    do
-      trie = word_list
-      |> Enum.reduce(@ti.insert(), &(@ti.insert(&2,&1)))
-      
+         word_list <- String.split(medium_text, "\n") do
+      trie =
+        word_list
+        |> Enum.reduce(@ti.insert(), &@ti.insert(&2, &1))
+
       result = trie[:v][:e][:t][:u][:s][:t][:value]
-      
+
       assert result === "vetust"
 
       result = trie[:f][:a][:s][:t][:h][:o][:l][:d][:value]
-      
+
       assert result === "fasthold"
     end
   end

@@ -1,6 +1,7 @@
 defmodule TrieMerger do
   @ti TrieInserter
-  def merge(), do: %{}
+
+  def merge(), do: new_trie()
   def merge(single_trie), do: single_trie
 
   def merge(nil, trie), do: trie
@@ -11,6 +12,14 @@ defmodule TrieMerger do
   end
 
   defp merge_keys({key, value}, trie_one) do
-    Map.put(trie_one, key, merge(trie_one[key], value))
+    # trying to make it more clear what is happening
+    with sub_trie_one <- trie_one[key],
+         sub_trie_two <- value,
+         new_sub_trie <- merge(sub_trie_one, sub_trie_two)
+    do
+      Map.put(trie_one, key, new_sub_trie)
+    end
   end
+
+  defp new_trie, do: @ti.insert()
 end

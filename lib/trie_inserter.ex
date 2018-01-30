@@ -2,7 +2,7 @@ defmodule TrieInserter do
   def insert(word \\ "")
 
   def insert(word) do
-    insert(%{}, word)
+    insert(new_trie(), word)
   end
 
   def insert(trie, ""), do: trie
@@ -12,7 +12,7 @@ defmodule TrieInserter do
   end
 
   def insert(nil, graphemeList, word) do
-    insert(%{}, graphemeList, word)
+    insert(new_trie(), graphemeList, word)
   end
 
   def insert(trie, [], word) do
@@ -31,4 +31,6 @@ defmodule TrieInserter do
     |> String.graphemes()
     |> Enum.map(&String.to_atom/1)
   end
+
+  defp new_trie, do: %{}
 end

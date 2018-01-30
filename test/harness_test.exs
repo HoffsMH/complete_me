@@ -27,27 +27,17 @@ defmodule HarnessTest do
 
   @tag :skip
   test "suggests_off_of_small_dataset" do
-    trie =
-      insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
-      |> @cm.suggest("p")
-      |> equal(["pizza"])
-      |> assert
+    model = insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
 
-    @cm.suggest(trie, "piz")
-    |> equal(["pizza"])
-    |> assert
+    assert @cm.suggest(model, "p") === ["pizza"]
 
-    @cm.suggest(trie, "zo")
-    |> equal(["zombies"])
-    |> assert
+    assert @cm.suggest(model, "piz") === ["pizza"]
 
-    @cm.suggest(trie, "a")
-    |> equal(["a", "aardvark"])
-    |> assert
+    assert @cm.suggest(model, "zo") === ["zombies"]
 
-    @cm.suggest(trie, "aa")
-    |> equal(["aardvark"])
-    |> assert
+    assert @cm.suggest(model, "a") === ["aardvark"]
+
+    assert @cm.suggest(model, "aa") === ["aardvark"]
   end
 
   @tag :skip

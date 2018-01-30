@@ -4,6 +4,7 @@ defmodule CompleteMe do
 
   def count, do: 0
   def insert, do: create_model()
+  def populate(), do: create_model()
 
   def count(%{words: words})
       when is_list(words),
@@ -13,11 +14,9 @@ defmodule CompleteMe do
     create_model(@ti.insert(word), [word])
   end
 
-  def insert(%{trie: trie, words: words} = model, word) do
+  def insert(%{trie: trie, words: words}, word) do
     create_model(@ti.insert(trie, word), Words.to_list(words, word))
   end
-
-  def populate(), do: create_model()
 
   def populate(word_text) do
     create_model(@tp.populate(word_text), Words.to_list(word_text))

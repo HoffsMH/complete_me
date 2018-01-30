@@ -28,10 +28,38 @@ defmodule TriePopulatorTest do
     assert @tp.populate("a\nb") === expected
   end
 
+  test "populate with a and a trie" do
+    trie = %{b: %{value: "b"}}
+    expected = %{b: %{value: "b"}, a: %{value: "a"}}
+
+    assert @tp.populate(trie, "a") === expected
+  end
+
+  test "populate with b and a trie" do
+    trie = %{a: %{value: "a"}}
+    expected = %{b: %{value: "b"}, a: %{value: "a"}}
+
+    assert @tp.populate(trie, "b") === expected
+  end
+
+  test "populate with a\nb and a trie" do
+    trie = %{c: %{value: "c"}}
+    expected = %{a: %{value: "a"}, b: %{value: "b"}, c: %{value: "c"}}
+
+    assert @tp.populate(trie, "a\nb") === expected
+  end
+
   test "populate with [a,b]" do
     expected = %{a: %{value: "a"}, b: %{value: "b"}}
 
     assert @tp.populate(["a", "b"]) === expected
+  end
+
+  test "populate with [a,b] and a trie" do
+    trie = %{c: %{value: "c"}}
+    expected = %{a: %{value: "a"}, b: %{value: "b"}, c: %{value: "c"}}
+
+    assert @tp.populate(trie, ["a", "b"]) === expected
   end
 
   test "populate with medium word list" do

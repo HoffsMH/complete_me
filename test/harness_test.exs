@@ -3,17 +3,14 @@ defmodule HarnessTest do
   def equal(a, b), do: a === b
   @cm CompleteMe
 
-  @tag :skip
   test "starting_count" do
     assert @cm.count() === 0
   end
 
-  @tag :skip
   test "inserts_single_word" do
-    @cm.insert("pizza")
-    |> @cm.count()
-    |> equal(1)
-    |> assert
+    model = @cm.insert("pizza")
+
+    assert @cm.count(model) === 1
   end
 
   @tag :skip

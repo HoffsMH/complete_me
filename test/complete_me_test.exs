@@ -40,4 +40,21 @@ defmodule CompleteMeTest do
 
     assert @cm.count(model) === 4
   end
+
+  test "count with populated model does not allow duplicates" do
+    model =
+      @cm.insert("hello")
+      |> @cm.insert("goodbye")
+      |> @cm.insert("what")
+      |> @cm.insert("ok")
+      |> @cm.insert("what")
+
+    assert @cm.count(model) === 4
+  end
+
+  test "populate with nothing" do
+    model = @cm.populate()
+
+    assert model === %{trie: %{}, words: []}
+  end
 end

@@ -20,7 +20,7 @@ defmodule CompleteMeTest do
   end
 
   test "count with empty model" do
-    assert @cm.count(%{}) === 0
+    assert @cm.count(%{words: []}) === 0
   end
 
   test "count with populated model" do
@@ -52,9 +52,31 @@ defmodule CompleteMeTest do
     assert @cm.count(model) === 4
   end
 
-  test "populate with nothing" do
-    model = @cm.populate()
+  test "fresh populate with no params" do
+    assert @cm.populate() === %{
+             trie: %{},
+             words: []
+           }
+  end
 
-    assert model === %{trie: %{}, words: []}
+  test "fresh populate a" do
+    assert @cm.populate("a") === %{
+             trie: %{a: %{value: "a"}},
+             words: ["a"]
+           }
+  end
+
+  test "fresh populate a\nb" do
+    assert @cm.populate("a\nb") === %{
+             trie: %{a: %{value: "a"}, b: %{value: "b"}},
+             words: ["a", "b"]
+           }
+  end
+
+  test "fresh populate a\nb\nb" do
+    assert @cm.populate("a\nb\nb") === %{
+             trie: %{a: %{value: "a"}, b: %{value: "b"}},
+             words: ["a", "b"]
+           }
   end
 end

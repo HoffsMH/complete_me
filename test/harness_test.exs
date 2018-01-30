@@ -13,20 +13,16 @@ defmodule HarnessTest do
     assert @cm.count(model) === 1
   end
 
-  @tag :skip
   test "inserts_multiple_words" do
-    @cm.populate("pizza\ndog\ncat")
-    |> @cm.count()
-    |> equal(3)
-    |> assert
+    model = @cm.populate("pizza\ndog\ncat")
+
+    assert @cm.count(model) === 3
   end
 
-  @tag :skip
   test "counts_inserted_words" do
-    insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
-    |> @cm.count()
-    |> equal(5)
-    |> assert
+    model = insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
+
+    assert @cm.count(model) === 5
   end
 
   @tag :skip

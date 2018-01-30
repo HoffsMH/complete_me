@@ -2,45 +2,32 @@ defmodule CompleteMe do
   @ti TrieInserter
   @tp TriePopulator
 
-  def count(model \\ %{})
+  def count, do: 0
+  def insert, do: create_model()
 
   def count(%{words: words})
-      when is_list(words) do
-    length(words)
-  end
+      when is_list(words),
+      do: length(words)
 
-  def count(%{}), do: 0
-
-  def insert do
-    create_model(@ti.insert(), [])
-  end
-
-  def insert(word) when is_binary(word) do
+  def insert(word) do
     create_model(@ti.insert(word), [word])
   end
 
   def insert(%{trie: trie, words: words} = model, word) do
-    unless Enum.member?(words, word) do
-      create_model(@ti.insert(trie, word), [word | words])
-    else
-      model
-    end
+    create_model(@ti.insert(trie, word), Words.to_list(words, word))
   end
 
-  def populate(), do: create_model(@tp.populate(), [])
+  def populate(), do: create_model()
 
-  def populate(text) when is_binary(text) do
-    create_model(@tp.populate(text), [])
-  end
-
-  def populate(%{trie: trie, words: words}, text) do
-    create_model(
-      @tp.populate(trie, String.split(text, "\n")),
-      Enum.concat(String.split(text, "\n"), words)
-    )
+  def populate(word_text) do
+    create_model(@tp.populate(word_text), Words.to_list(word_text))
   end
 
   defp create_model(trie, words) do
     %{trie: trie, words: words}
+  end
+
+  defp create_model do
+    %{trie: %{}, words: []}
   end
 end

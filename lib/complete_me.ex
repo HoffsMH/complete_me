@@ -1,10 +1,12 @@
 defmodule CompleteMe do
   @ti TrieInserter
   @tp TriePopulator
+  @ts TrieSuggestion
 
   def count, do: 0
   def insert, do: create_model()
   def populate(), do: create_model()
+  def suggest(), do: create_model()
 
   def count(%{words: words})
       when is_list(words),
@@ -22,11 +24,13 @@ defmodule CompleteMe do
     create_model(@tp.populate(word_text), Words.to_list(word_text))
   end
 
+  def suggest(%{trie: trie}, text) do
+    @ts.suggest(trie, text)
+  end
+
   defp create_model(trie, words) do
     %{trie: trie, words: words}
   end
 
-  defp create_model do
-    %{trie: %{}, words: []}
-  end
+  defp create_model, do: %{trie: %{}, words: []}
 end

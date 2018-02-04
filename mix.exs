@@ -22,6 +22,7 @@ defmodule CompleteMe.MixProject do
   defp deps do
     [
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
+      {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:benchfella, "~> 0.3.5"}
     ]
   end

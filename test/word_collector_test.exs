@@ -30,5 +30,4 @@ defmodule WordCollectorTest do
 
     assert @wc.collect(model[:trie]) === []
   end
-
 end

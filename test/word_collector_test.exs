@@ -24,4 +24,11 @@ defmodule WordCollectorTest do
 
     assert @wc.collect(model[:trie]) === ["a", "ba", "bat", "batter"]
   end
+
+  test "collect with more complicated model and nothing to collect" do
+    model = CompleteMe.populate()
+
+    assert @wc.collect(model[:trie]) === []
+  end
+
 end

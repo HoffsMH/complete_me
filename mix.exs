@@ -7,7 +7,8 @@ defmodule CompleteMe.MixProject do
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: Coverex.Task]
     ]
   end
 
@@ -25,7 +26,8 @@ defmodule CompleteMe.MixProject do
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:benchfella, "~> 0.3.5"},
       {:earmark, "~> 1.2.2", only: :dev},
-      {:ex_doc, "~> 0.18.2", only: :dev}
+      {:ex_doc, "~> 0.18.2", only: :dev},
+      {:coverex, "~> 1.4.10", only: :test}
     ]
   end
 end

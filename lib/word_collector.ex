@@ -6,6 +6,8 @@ defmodule WordCollector do
     |> sort
   end
 
+  defp collect(nil, _), do: []
+
   defp collect({:value, word}, depth) do
     %{word: word, depth: depth}
   end

@@ -23,4 +23,9 @@ defmodule TrieSuggestionTest do
     trie = %{a: %{value: "a"}, b: %{a: %{t: %{value: "bat"}}, value: "b"}}
     assert @ts.suggest(trie, "b") === ["bat"]
   end
+
+  test "suggest when given a string AND a model and nothing to suggest" do
+    trie = %{a: %{value: "a"}, b: %{a: %{t: %{value: "bat"}}, value: "b"}}
+    assert @ts.suggest(trie, "batt") === []
+  end
 end

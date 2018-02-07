@@ -79,4 +79,8 @@ defmodule CompleteMeTest do
              words: ["a", "b"]
            }
   end
+
+  test "populate with no args" do
+    assert @cm.suggest() === %{trie: %{}, words: []}
+  end
 end

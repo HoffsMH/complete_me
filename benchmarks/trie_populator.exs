@@ -14,6 +14,11 @@ Benchee.run(%{
     with medium_text <- medium_word_list.() do
       trie = TriePopulatorTwo.populate(medium_text)
     end
+  end,
+  "medium_three" => fn -> 
+    with medium_text <- medium_word_list.() do
+      trie = Tpt.p(medium_text)
+    end
   end
 },
 formatters: [

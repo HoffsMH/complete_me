@@ -1,101 +1,128 @@
-defmodule TriePopulatorThree do
+defmodule Tpt do
   @ti TrieInserter
+  @tm TrieMerger
 
-  def populate(words \\ "")
+  defp generate_model(process) do
+      %{ 
+        process: process,
+        trie_build_jobs: [],
+        trie_merge_jobs: [],
+        tries: []
+      }
+  end
 
-  def populate(words) do
-    Agent.start_link(fn -> [] end, name: Tries)
-    Agent.start_link(fn -> false end, name: LastCall)
-    do_things()
+  def thing(word) do
+    Agent.update(Tpt.Model, fn (model) ->
+      %{
+        model | 
+        trie_build_jobs: [ spawn(fn -> 
+          trie = @ti.insert(word)
+          me = self()
+          Agent.update(Tpt.Model, fn model -> 
+            %{
+              model |
+              tries: [trie | model[:tries]],
+              trie_build_jobs: model[:trie_build_jobs] -- [me]
+            }
+          end)
+        end) | model[:trie_build_jobs]]
+      }
+    end)
+  end
 
-    words
+  def start_some_other_process do
+    selfie = self()
+    Agent.start_link(fn -> generate_model(selfie) end, name: Tpt.Model);
+    spawn(&something_that_recurses/0)
+  end
+
+  def something_that_recurses do
+    Agent.update(Tpt.Model, fn model -> 
+      
+      new_model = update(model)
+      
+      if new_model[:status] === "done" do
+        send(new_model[:process], {:result, new_model[:tries]})
+        exit(:normal)
+      end
+
+      new_model
+    end)
+    something_that_recurses()
+  end
+
+  def update(model) do
+    IO.puts("merge: ")
+    IO.puts(length(model[:trie_merge_jobs]))
+    IO.puts("build: ")
+    IO.puts(length(model[:trie_build_jobs]))
+    IO.puts("tries: ")
+    IO.inspect(length(model[:tries]))
+    peel_off_two_tries_and_send_them_to_be_merged(model)
+  end
+
+  def peel_off_two_tries_and_send_them_to_be_merged(model) do
+    with [a, b | rest ] <- model[:tries] do
+      %{
+        model |
+        tries: rest,
+        trie_merge_jobs: [ spawn(fn ->
+        trie = @tm.merge(a, b)
+        me = self()
+        Agent.update(Tpt.Model, fn model ->
+          %{
+            model |
+            tries: [trie | model[:tries]],
+            trie_merge_jobs: model[:trie_merge_jobs] -- [me]
+          }
+        end)
+      end) | model[:trie_merge_jobs]]
+      }
+    else
+      _ -> 
+        if all_done(model) do
+          Map.put(model, :status, "done")
+        else
+          model
+        end
+    end
+  end
+
+  def all_done(model) do
+    !List.first(model[:trie_merge_jobs]) &&
+    !List.first(model[:trie_build_jobs]) &&
+    length(model[:tries]) === 1
+  end
+
+  def p() do
+    start_some_other_process()
+
+    medium_word_list()
     |> Words.to_list()
-    |> Enum.map(&ok_what/1)
+    |> Enum.each(&thing/1)
 
-    # tell do_things last call
-    Agent.update(LastCall, fn status -> true end)
-
+    receive do
+      {:result, result} -> result
+    end
   end
 
-  def do_things do
-    # are there 2 things in the Agent state
-    Agent.update(Tries, fn  trie_list -> 
-      with [a, b | rest] <- trie_list do
-        spawn(Fox, :thing_two, [a,b])
-        IO.puts('it had atleast two');
-        rest
-      else
+  def pt() do
+    start_some_other_process()
 
-        _ ->
+    large_word_list()
+    |> Words.to_list()
+    |> Enum.each(&thing/1)
 
-          IO.puts('it had less than two');
-          trie_list
-      end
-    end)
-    Agent.update(LastCall, fn status -> 
-      if status === true do
-      else
-        do_things()
-      end
-      status
-    end)
+    receive do
+      {:result, result} -> result
+    end
   end
 
-  def populate_medium do
-    #TriePopulatorThree.populate_medium
-    populate(medium_word_list)
+  def large_word_list do
+   File.read!("/usr/share/dict/words") 
   end
 
   def medium_word_list do
-    File.read!("./test/medium.txt")
-  end
-
-  def ok_what(word) do
-    spawn(Fox, :thing, [word])
+   File.read!("./test/medium.txt")
   end
 end
-
-defmodule Fox do
-  def thing(word) do
-    trie = TrieInserter.insert(word)
-
-    Agent.update(Tries, &( [trie | &1 ] ))
-    exit(:done)
-  end
-
-  def thing_two(a, b) do
-    trie = TrieMerger.merge(a,b)
-
-    Agent.update(Tries, &( [trie | &1 ] ))
-    exit(:done)
-  end
-
-  # |> Enum.reduce(new_trie(), &@ti.insert(&2, &1))
-  # TrieInserter  
-end
-
-# defmodule Example do
-#   def add(a, b) do
-#     IO.puts(a + b)
-#   end
-# end
-
-# spawn(Example, :add, [2, 3])
-# # will spawn and output 5
-
-# # what could this be?
-# #  we could build a trie in here
-# # when done we could
-# defmodule Example do
-#   def listen do
-#     receive do
-#       message -> IO.puts(message)
-#     end
-
-#     listen()
-#   end
-# end
-
-# pid = spawn(Example, :listen, [])
-
-# send pid, "hello"

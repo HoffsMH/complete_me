@@ -22,4 +22,5 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 complete_me-*.tar
 
-/bench/graphs/**
+# everything from benchfella
+/bench/

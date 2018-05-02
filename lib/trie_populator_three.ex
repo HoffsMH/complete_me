@@ -1,8 +1,9 @@
 require IEx
 
-defmodule Tpt do
+defmodule TriePopulatorThree do
   use GenServer
   @ti TrieInserter
+  @tm TrieMerger
 
   def init(state), do: {:ok, state}
 
@@ -14,9 +15,65 @@ defmodule Tpt do
   end
 
   def populate(word_list) when is_list(word_list) do
-    word_list
-    |> Enum.map(&start_trie_list/1)
-    |> Enum.map(&Task.await/1)
+    GenServer.start_link(__MODULE__, initial_state(), name: __MODULE__)
+    trie_inserts =
+      word_list
+      |> Enum.map(&start_trie_list/1)
+
+    {pid, ref} = start_combining()
+
+    trie_inserts
+    |> Enum.each(&Task.await/1)
+    done_inserting()
+
+    receive do
+      {:DOWN, ref, :process, from_pid, reason} ->
+        get_first_trie()
+    end
+  end
+
+  def done_inserting() do
+    GenServer.call(__MODULE__, {:done_inserting})
+  end
+  def handle_call({:done_inserting}, _from, state) do
+    {:reply, :ok, %{state| doneInserting: true}}
+  end
+
+  def start_combining do
+    spawn_monitor(__MODULE__, :combine, [])
+  end
+
+  def combine do
+    with {:success, [a, b]} <- pull_out_first_two()
+    do
+      Task.async(__MODULE__, :merge_and_load, [a,b])
+      combine()
+    else
+      {:empty, []} ->
+        combine()
+      {:done} ->
+        exit(:done)
+    end
+  end
+
+  def merge_and_load(a, b) do
+    load_trie(@tm.merge(a,b))
+  end
+
+  def pull_out_first_two() do
+    GenServer.call(__MODULE__, {:first_two_tries})
+  end
+
+  def handle_call({:first_two_tries}, _from, state) do
+    cond do
+    length(state.tries) > 1 ->
+      [a, b | new_tries] = state.tries
+      {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
+    state.doneInserting ->
+      {:reply, {:done}, state}
+    true ->
+      {:reply, {:empty, []}, state}
+    end
   end
 
   def medium_word_list do
@@ -25,8 +82,14 @@ defmodule Tpt do
   end
 
   def pm do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
     populate(medium_word_list())
+  end
+
+  def initial_state do
+    %{
+      tries: [],
+      doneInserting: false
+    }
   end
 
   def start_trie_list(word) do
@@ -41,10 +104,13 @@ defmodule Tpt do
   def load_trie(trie), do: GenServer.cast(__MODULE__, {:load_trie, trie})
 
   def handle_cast({:load_trie, trie}, state) do
-    {:noreply, state ++ [trie]}
+    {:noreply, %{state | tries: state.tries ++ [trie]}}
   end
 
-  def handle_call(:list, _from, state) do
-    {:reply, state, state}
+  def get_first_trie do
+    GenServer.call(__MODULE__, {:first_trie})
+  end
+  def handle_call({:first_trie}, _from, state) do
+    {:reply, hd(state.tries), state}
   end
 end

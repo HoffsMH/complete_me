@@ -19,24 +19,36 @@ defmodule TriePopulatorThree do
     trie_inserts =
       word_list
       |> Enum.map(&start_trie_list/1)
-
-    {pid, ref} = start_combining()
+    {_pid, ref} = start_combining()
 
     trie_inserts
     |> Enum.each(&Task.await/1)
     done_inserting()
 
     receive do
-      {:DOWN, ref, :process, from_pid, reason} ->
+      {:DOWN, ^ref, :process, _from_pid, _reason} ->
         get_first_trie()
     end
   end
 
   def done_inserting() do
-    GenServer.call(__MODULE__, {:done_inserting})
+    GenServer.call(__MODULE__, {:done_inserting}, :infinity)
   end
+
   def handle_call({:done_inserting}, _from, state) do
     {:reply, :ok, %{state| doneInserting: true}}
+  end
+
+  def handle_call({:first_two_tries}, _from, state) do
+    cond do
+    length(state.tries) > 1 ->
+      [a, b | new_tries] = state.tries
+      {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
+    state.doneInserting ->
+      {:reply, {:done}, state}
+    true ->
+      {:reply, {:empty, []}, state}
+    end
   end
 
   def start_combining do
@@ -61,29 +73,9 @@ defmodule TriePopulatorThree do
   end
 
   def pull_out_first_two() do
-    GenServer.call(__MODULE__, {:first_two_tries})
+    GenServer.call(__MODULE__, {:first_two_tries}, :infinity)
   end
 
-  def handle_call({:first_two_tries}, _from, state) do
-    cond do
-    length(state.tries) > 1 ->
-      [a, b | new_tries] = state.tries
-      {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
-    state.doneInserting ->
-      {:reply, {:done}, state}
-    true ->
-      {:reply, {:empty, []}, state}
-    end
-  end
-
-  def medium_word_list do
-    {:ok, text} = File.read("./test/medium.txt")
-    text
-  end
-
-  def pm do
-    populate(medium_word_list())
-  end
 
   def initial_state do
     %{
@@ -108,9 +100,14 @@ defmodule TriePopulatorThree do
   end
 
   def get_first_trie do
-    GenServer.call(__MODULE__, {:first_trie})
+    GenServer.call(__MODULE__, {:first_trie}, :infinity)
   end
+
   def handle_call({:first_trie}, _from, state) do
-    {:reply, hd(state.tries), state}
+    if length(state.tries) === 0 do
+      {:reply, state, state}
+    else
+      {:reply, hd(state.tries), state}
+    end
   end
 end

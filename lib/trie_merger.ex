@@ -6,10 +6,15 @@ defmodule TrieMerger do
 
   def merge(nil, trie), do: trie
 
-  def merge(trie_one, trie_two) do
+  def merge(trie_one, trie_two) when is_map(trie_two) do
     trie_two
     |> Enum.reduce(trie_one, &merge_keys/2)
   end
+
+  def merge(trie_one, trie_two) do
+    trie_one
+  end
+
 
   defp merge_keys({key, value}, trie_one) do
     # trying to make it more clear what is happening

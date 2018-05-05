@@ -17,19 +17,15 @@ defmodule TriePopulatorFour do
   def populate(word_list) when is_list(word_list) do
     GenServer.start_link(__MODULE__, initial_state(), name: __MODULE__)
 
-    trie_inserts =
-      word_list
-      |> Enum.map(&start_trie_list/1)
-
-    {_pid, ref} = start_combining()
-
-    trie_inserts
-    |> Enum.each(&Task.await/1)
-
+    word_list
+    |> Enum.each(&insert_single_trie/1)
     done_inserting()
 
+    {pid, ref} = start_combining()
+
+
     receive do
-      {:DOWN, ^ref, :process, _from_pid, _reason} ->
+      {:DOWN, ^ref, :process, ^pid, _reason} ->
         get_first_trie()
     end
   end
@@ -86,10 +82,6 @@ defmodule TriePopulatorFour do
       tries: [],
       doneInserting: false
     }
-  end
-
-  def start_trie_list(word) do
-    Task.async(__MODULE__, :insert_single_trie, [word])
   end
 
   def insert_single_trie(word) do

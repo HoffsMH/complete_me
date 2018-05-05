@@ -15,7 +15,6 @@ defmodule TrieMerger do
     trie_one
   end
 
-
   defp merge_keys({key, value}, trie_one) do
     # trying to make it more clear what is happening
     with sub_trie_one <- trie_one[key],

@@ -16,13 +16,16 @@ defmodule TriePopulatorThree do
 
   def populate(word_list) when is_list(word_list) do
     GenServer.start_link(__MODULE__, initial_state(), name: __MODULE__)
+
     trie_inserts =
       word_list
       |> Enum.map(&start_trie_list/1)
+
     {_pid, ref} = start_combining()
 
     trie_inserts
     |> Enum.each(&Task.await/1)
+
     done_inserting()
 
     receive do
@@ -36,18 +39,20 @@ defmodule TriePopulatorThree do
   end
 
   def handle_call({:done_inserting}, _from, state) do
-    {:reply, :ok, %{state| doneInserting: true}}
+    {:reply, :ok, %{state | doneInserting: true}}
   end
 
   def handle_call({:first_two_tries}, _from, state) do
     cond do
-    length(state.tries) > 1 ->
-      [a, b | new_tries] = state.tries
-      {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
-    state.doneInserting ->
-      {:reply, {:done}, state}
-    true ->
-      {:reply, {:empty, []}, state}
+      length(state.tries) > 1 ->
+        [a, b | new_tries] = state.tries
+        {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
+
+      state.doneInserting ->
+        {:reply, {:done}, state}
+
+      true ->
+        {:reply, {:empty, []}, state}
     end
   end
 
@@ -56,26 +61,25 @@ defmodule TriePopulatorThree do
   end
 
   def combine do
-    with {:success, [a, b]} <- pull_out_first_two()
-    do
-      Task.async(__MODULE__, :merge_and_load, [a,b])
+    with {:success, [a, b]} <- pull_out_first_two() do
+      Task.async(__MODULE__, :merge_and_load, [a, b])
       combine()
     else
       {:empty, []} ->
         combine()
+
       {:done} ->
         exit(:done)
     end
   end
 
   def merge_and_load(a, b) do
-    load_trie(@tm.merge(a,b))
+    load_trie(@tm.merge(a, b))
   end
 
   def pull_out_first_two() do
     GenServer.call(__MODULE__, {:first_two_tries}, :infinity)
   end
-
 
   def initial_state do
     %{

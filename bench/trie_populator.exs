@@ -2,7 +2,7 @@
 #     File.read("/usr/share/dict/words")
 #   end
 
-{:ok, medium_text } = File.read("./test/medium.txt")
+{:ok, medium_text} = File.read("./test/medium.txt")
 
 Benchee.run(%{
   "trie_pop" => fn -> TriePopulator.populate(medium_text) end,

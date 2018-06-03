@@ -6,7 +6,7 @@ defmodule TriePopulatorFive do
 
   def populate(words) do
     word_list = Words.to_list(words)
-    { first_half, second_half } = split_in_half(word_list)
+    {first_half, second_half} = split_in_half(word_list)
 
     first_trie_task = Task.async(__MODULE__, :form_trie_from_word_list, [first_half])
     second_trie_task = Task.async(__MODULE__, :form_trie_from_word_list, [second_half])

@@ -12,7 +12,6 @@ defmodule CompleteMe.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger]
@@ -25,7 +24,8 @@ defmodule CompleteMe.MixProject do
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
       {:benchee, "~> 0.13.0", only: :dev},
-      {:coverex, "~> 1.4.10", only: :test}
+      {:coverex, "~> 1.4.10", only: :test},
+      {:poolboy, ">= 0.0.0"}
     ]
   end
 end

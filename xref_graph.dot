@@ -1,0 +1,25 @@
+digraph "xref graph" {
+  "lib/complete_me.ex"
+  "lib/complete_me.ex" -> "lib/trie_inserter.ex" [label="(compile)"]
+  "lib/complete_me.ex" -> "lib/trie_populator.ex" [label="(compile)"]
+  "lib/trie_populator.ex" -> "lib/trie_inserter.ex" [label="(compile)"]
+  "lib/trie_populator.ex" -> "lib/words.ex"
+  "lib/complete_me.ex" -> "lib/trie_suggestion.ex" [label="(compile)"]
+  "lib/trie_suggestion.ex" -> "lib/word_collector.ex" [label="(compile)"]
+  "lib/complete_me.ex" -> "lib/words.ex"
+  "lib/parallel.ex"
+  "lib/trie_inserter.ex"
+  "lib/trie_merger.ex"
+  "lib/trie_merger.ex" -> "lib/trie_inserter.ex" [label="(compile)"]
+  "lib/trie_populator.ex"
+  "lib/trie_populator_three.ex"
+  "lib/trie_populator_three.ex" -> "lib/trie_inserter.ex" [label="(compile)"]
+  "lib/trie_populator_three.ex" -> "lib/trie_merger.ex" [label="(compile)"]
+  "lib/trie_populator_two.ex"
+  "lib/trie_populator_two.ex" -> "lib/parallel.ex" [label="(compile)"]
+  "lib/trie_populator_two.ex" -> "lib/trie_inserter.ex" [label="(compile)"]
+  "lib/trie_populator_two.ex" -> "lib/trie_merger.ex" [label="(compile)"]
+  "lib/trie_suggestion.ex"
+  "lib/word_collector.ex"
+  "lib/words.ex"
+}

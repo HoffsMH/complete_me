@@ -38,10 +38,6 @@ defmodule TriePopulatorThreeTest do
     with {:ok, medium_text} <- medium_word_list() do
       trie = @tp3.populate(medium_text)
 
-      result = trie[:v][:e][:t][:u][:s][:t][:value]
-
-      assert result === "vetust"
-
       result = trie[:f][:a][:s][:t][:h][:o][:l][:d][:value]
 
       assert result === "fasthold"

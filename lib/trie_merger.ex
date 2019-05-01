@@ -1,9 +1,4 @@
 defmodule TrieMerger do
-  @ti TrieInserter
-
-  def merge(), do: new_trie()
-  def merge(single_trie), do: single_trie
-
   def merge(nil, trie), do: trie
 
   def merge(trie_one, trie_two) when is_map(trie_two) do
@@ -11,9 +6,8 @@ defmodule TrieMerger do
     |> Enum.reduce(trie_one, &merge_keys/2)
   end
 
-  def merge(trie_one, trie_two) do
-    trie_one
-  end
+  def merge(trie_one, trie_two)
+    when(trie_one == trie_two), do: trie_one
 
   defp merge_keys({key, value}, trie_one) do
     # trying to make it more clear what is happening
@@ -23,6 +17,4 @@ defmodule TrieMerger do
       Map.put(trie_one, key, new_sub_trie)
     end
   end
-
-  defp new_trie, do: @ti.insert()
 end

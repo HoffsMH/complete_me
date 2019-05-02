@@ -1,17 +1,23 @@
-defmodule TrieInserterFive do
+defmodule TriePopulatorFive do
 
   @default_job_limit 4
-  def initial_state do
-    %{
-      history: [],
-      tries: [],
-      words: [],
-      jobs: [],
-      job_limit: @default_job_limit
-    }
-  end
-  def run do
-  end
+
+  # @type t ::  %__MODULE__{
+  #   history:
+  #   tries:
+  #   words:
+  #   jobs:
+  #   job_limit:
+  # }
+
+  defstruct [
+    history: '',
+    tries: [],
+    words: [],
+    jobs: [],
+    job_limit: @default_job_limit
+  ]
+
 
   def run(state) do
     # if length(state.jobs) >= state.job_limit ||  length(state.words) <= 0 do
@@ -31,4 +37,11 @@ defmodule TrieInserterFive do
 
     # run(state)
   end
+
+  @doc """
+  function that takes state and returns 2 new states
+  one state to return to same process
+  one state to return to a branched process that will solve for a certain subset
+  """
+
 end

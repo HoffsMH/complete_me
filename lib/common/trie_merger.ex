@@ -7,7 +7,8 @@ defmodule TrieMerger do
   end
 
   def merge(trie_one, trie_two)
-    when(trie_one == trie_two), do: trie_one
+      when trie_one == trie_two,
+      do: trie_one
 
   defp merge_keys({key, value}, trie_one) do
     # trying to make it more clear what is happening

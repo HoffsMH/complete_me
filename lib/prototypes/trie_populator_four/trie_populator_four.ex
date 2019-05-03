@@ -65,9 +65,10 @@ defmodule TriePopulatorFour do
 
       :poolboy.transaction(
         :worker,
-        fn pid -> GenServer.call(pid, {:merge_and_load, [a,b]}) end,
+        fn pid -> GenServer.call(pid, {:merge_and_load, [a, b]}) end,
         60000
       )
+
       combine()
     else
       {:empty, []} ->

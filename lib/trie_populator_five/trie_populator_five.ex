@@ -1,5 +1,5 @@
 defmodule TriePopulatorFive do
-  @default_job_limit 20
+  @default_job_limit 4
 
   @type t :: %__MODULE__{
           history: charlist,
@@ -34,8 +34,28 @@ defmodule TriePopulatorFive do
       when length(tries) == 1,
       do: List.first(tries)
 
-  # if the job queue is full, wait for some jobs to finish and
-  # add the produced sub tries to the list of tries to be merged
+  def run(
+        %{
+          history: history,
+          jobs: jobs,
+          job_limit: job_limit,
+          tries: [trie | tries],
+          words: [word | words]
+        } = state
+      )
+      when length(jobs) >= job_limit do
+    with subword <- to_charlist(word) -- history,
+         path <- Enum.map(subword, &List.to_atom([&1])) do
+      run(%TriePopulatorFive{
+        state
+        | words: words,
+          tries: tries ++ [TrieInserter.insert(trie, path, word)]
+      })
+    end
+  end
+
+  # if the job queue is full and there are no more tries to insert into existing words
+  # finish up the existing jobs
   def run(%{jobs: jobs, job_limit: job_limit} = state)
       when length(jobs) >= job_limit,
       do: harvest_jobs(state)
@@ -48,7 +68,7 @@ defmodule TriePopulatorFive do
   def run(%{tries: [trie1, trie2 | rest], jobs: jobs} = state) do
     new_state = %TriePopulatorFive{
       state
-      | jobs: jobs ++ [Task.async(fn -> TrieMerger.merge(trie1, trie2) end)],
+      | jobs: jobs ++ [Task.async(fn -> Map.merge(trie1, trie2) end)],
         tries: rest
     }
 
@@ -56,57 +76,65 @@ defmodule TriePopulatorFive do
   end
 
   def run(%{history: history, words: [word | rest]} = state) do
-    # if multiple_subwords?(state) do
-    #   with {main_state, split_state} <- split_states(state) do
-    #     run(%TriePopulatorFive{
-    #           main_state |
-    #           jobs: main_state.jobs ++ [
-    #             Task.async(fn ->
-    #               run(split_state)
-    #             end)
-    #           ]
+    if multiple_subwords?(state) do
+      with {:ok, main_state, split_state} <- split_states(state) do
+        run(%TriePopulatorFive{
+          main_state
+          | jobs:
+              main_state.jobs ++
+                [
+                  split_job(history, split_state)
+                ]
+        })
+      end
+    else
+      run(%TriePopulatorFive{
+        state
+        | words: rest,
+          tries: state.tries ++ [finish_trie(word, history)]
+      })
+    end
+  end
 
-    #         }
-    #     )
-    #   else
-    #     run(%TriePopulatorFive{
-    #           state |
-    #           words: rest,
-    #           tries: state.tries ++ [finish_trie(word, history)]
-    #         })
-    #   end
-    # end
-
-    run(%TriePopulatorFive{
-      state
-      | words: rest,
-        tries: state.tries ++ [finish_trie(word, history)]
-    })
+  def split_job(history, %{history: split_history} = split_state) do
+    with outer_char <- [Enum.at(split_history, length(history))],
+         outer_atom <- List.to_atom(outer_char) do
+      Task.async(fn ->
+        %{
+          outer_atom => run(split_state)
+        }
+      end)
+    end
   end
 
   def split_states(%{history: history, words: [word | rest]} = state) do
-    # determine the full prefix for future iterations
-
-    # split_states
-    # history
-
-    # with next_character <- Enum.at(to_charlist(word1), length(history)),
-    #      prefix <- history ++ [next_character] do
-    #   split_states(state, )
-    # end
-
-    # {state}
+    with next_character <- Enum.at(to_charlist(word), length(history)),
+         split_history <- history ++ [next_character],
+         split_state <- %TriePopulatorFive{history: split_history} do
+      split_states(state, split_state)
+    end
   end
 
-  def split_states(%{words: [word | rest]}, split) do
-    # if the word begins with the prefix put in the split state and recurse
-    # if the word doesn't begin witht he prefix return a tuple of both states
+  def split_states(%{words: []} = main_state, split_state), do: {:ok, main_state, split_state}
 
-    # split_states(%TriePopulatorFive{
-    #       main |
-    #       words: rest
-
-    #              })
+  def split_states(
+        %{words: [word | rest] = words} = main_state,
+        %{history: split_history} = split_state
+      ) do
+    if List.starts_with?(to_charlist(word), split_history) do
+      split_states(
+        %TriePopulatorFive{
+          main_state
+          | words: rest
+        },
+        %TriePopulatorFive{
+          split_state
+          | words: split_state.words ++ [word]
+        }
+      )
+    else
+      {:ok, main_state, split_state}
+    end
   end
 
   def harvest_jobs(%{jobs: jobs} = state) do

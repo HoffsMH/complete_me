@@ -20,6 +20,42 @@ defmodule TriePopulatorFiveTest do
     end
   end
 
+  describe "there are still multiple subwords grouped together with more history" do
+    setup do
+      state = %TriePopulatorFive{
+        history: 'cata',
+        words: ["cataclysm", "catacomb", "catback"]
+      }
+
+      {:ok, state: state}
+    end
+
+    test "subwords?/1 should yield true", context do
+      with %{state: state} <- context do
+        result = @subject.multiple_subwords?(state)
+        assert result == true
+      end
+    end
+  end
+
+  describe "there are no subwords of the first word and history is on the edge of current word" do
+    setup do
+      state = %TriePopulatorFive{
+        history: 'catac',
+        words: ["cataclysm", "catacomb", "catback"]
+      }
+
+      {:ok, state: state}
+    end
+
+    test "subwords?/1 should yield false", context do
+      with %{state: state} <- context do
+        result = @subject.multiple_subwords?(state)
+        assert result == false
+      end
+    end
+  end
+
   describe "when there is only one subword before the list separates" do
     setup do
       state = %TriePopulatorFive{
@@ -111,9 +147,8 @@ defmodule TriePopulatorFiveTest do
     setup do
       state = %TriePopulatorFive{
         tries: [
-          %{c: %{a: %{t: %{a: %{c: %{o: %{m: %{b: %{value: "catacomb"}}}}}}}}},
-          %{c: %{a: %{t: %{a: %{c: %{l: %{y: %{s: %{m: %{value: "cataclysm"}}}}}}}}}},
-          %{c: %{a: %{t: %{b: %{a: %{c: %{k: %{value: "catback"}}}}}}}}
+          %{o: %{m: %{b: %{value: "catacomb"}}}},
+          %{l: %{y: %{s: %{m: %{value: "cataclysm"}}}}}
         ]
       }
 
@@ -124,19 +159,8 @@ defmodule TriePopulatorFiveTest do
       with %{state: state} <- context,
            result <- @subject.run(state) do
         assert result == %{
-                 c: %{
-                   a: %{
-                     t: %{
-                       a: %{
-                         c: %{
-                           l: %{y: %{s: %{m: %{value: "cataclysm"}}}},
-                           o: %{m: %{b: %{value: "catacomb"}}}
-                         }
-                       },
-                       b: %{a: %{c: %{k: %{value: "catback"}}}}
-                     }
-                   }
-                 }
+                 l: %{y: %{s: %{m: %{value: "cataclysm"}}}},
+                 o: %{m: %{b: %{value: "catacomb"}}}
                }
       end
     end
@@ -212,7 +236,7 @@ defmodule TriePopulatorFiveTest do
   end
 
   describe "basic use case with medium word list" do
-    test "populates, each word in the file is findable on the list" do
+    test "populates: each word in the file is findable on the list" do
       with words <- medium_word_list(),
            result <- @subject.populate(words) do
         medium_word_list()
@@ -220,6 +244,45 @@ defmodule TriePopulatorFiveTest do
         |> Enum.each(fn word ->
           assert find_word(word, result) === word
         end)
+      end
+    end
+  end
+
+  describe "split_states/1" do
+    setup do
+      state = %TriePopulatorFive{
+        history: 'catac',
+        words: [
+          "cataclysm",
+          "cataclock",
+          "cataclambake",
+          "catacomb",
+          "catback"
+        ]
+      }
+
+      {:ok, state: state}
+    end
+
+    test "it splits the states in 2", context do
+      with %{state: state} <- context,
+           {:ok, main_state, split_state} <- @subject.split_states(state) do
+        assert main_state == %TriePopulatorFive{
+                 history: 'catac',
+                 words: [
+                   "catacomb",
+                   "catback"
+                 ]
+               }
+
+        assert split_state == %TriePopulatorFive{
+                 history: 'catacl',
+                 words: [
+                   "cataclysm",
+                   "cataclock",
+                   "cataclambake"
+                 ]
+               }
       end
     end
   end

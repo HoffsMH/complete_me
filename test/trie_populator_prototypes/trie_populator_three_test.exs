@@ -10,6 +10,7 @@ defmodule TriePopulatorThreeTest do
     assert @tp3.populate("") === %{}
   end
 
+
   # we are skipping this for now as this model is a prototype and
   # I dont want the flakey test as part of main test suite
   @tag :skip
@@ -25,6 +26,7 @@ defmodule TriePopulatorThreeTest do
     assert @tp3.populate("b") === expected
   end
 
+  @tag skip: true
   test "populate with a\nb" do
     expected = %{a: %{value: "a"}, b: %{value: "b"}}
 

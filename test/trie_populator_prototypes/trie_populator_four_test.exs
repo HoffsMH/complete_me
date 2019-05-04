@@ -25,6 +25,7 @@ defmodule TriePopulatorFourTest do
     assert @subject.populate("b") === expected
   end
 
+  @tag skip: true
   test "populate with a\nb" do
     expected = %{a: %{value: "a"}, b: %{value: "b"}}
 

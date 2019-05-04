@@ -23,9 +23,10 @@ defmodule CompleteMe.MixProject do
     [
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:dialyxir, "~> 0.5", only: [:dev], runtime: false},
-      {:benchee, "~> 0.13.0", only: :dev},
+      {:benchee, ">= 0.0.0", only: :dev},
       {:coverex, "~> 1.4.10", only: :test},
-      {:poolboy, ">= 0.0.0"}
+      {:poolboy, ">= 0.0.0"},
+      {:deep_merge, "~> 1.0", override: true}
     ]
   end
 end

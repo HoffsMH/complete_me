@@ -107,7 +107,6 @@ defmodule TriePopulatorFiveTest do
     end
   end
 
-  @tag skip: true
   describe "when there are multiple tries, no words and no jobs" do
     setup do
       state = %TriePopulatorFive{
@@ -124,14 +123,28 @@ defmodule TriePopulatorFiveTest do
     test "run/1 will eventually return a single trie", context do
       with %{state: state} <- context,
            result <- @subject.run(state) do
-        assert result == "ok"
+        assert result == %{
+                 c: %{
+                   a: %{
+                     t: %{
+                       a: %{
+                         c: %{
+                           l: %{y: %{s: %{m: %{value: "cataclysm"}}}},
+                           o: %{m: %{b: %{value: "catacomb"}}}
+                         }
+                       },
+                       b: %{a: %{c: %{k: %{value: "catback"}}}}
+                     }
+                   }
+                 }
+               }
       end
     end
   end
 
   describe "when there are no tries and no words and a single job pending" do
     setup do
-      state = %{
+      state = %TriePopulatorFive{
         jobs: [
           Task.async(fn ->
             %{c: %{a: %{t: %{b: %{a: %{c: %{k: %{value: "catback"}}}}}}}}
@@ -143,9 +156,26 @@ defmodule TriePopulatorFiveTest do
     end
 
     test "should wait for the job to finish then eventually return the result", context do
-      with %{state: state} <- context,
-           result <- @subject.run(state) do
-        assert result == %{c: %{a: %{t: %{b: %{a: %{c: %{k: %{value: "scatback"}}}}}}}}
+      with %{state: state} <- context do
+        result = @subject.run(state)
+        assert result == %{c: %{a: %{t: %{b: %{a: %{c: %{k: %{value: "catback"}}}}}}}}
+      end
+    end
+  end
+
+  describe "when there is a single word" do
+    setup do
+      state = %TriePopulatorFive{
+        words: ["catacomb"]
+      }
+
+      {:ok, state: state}
+    end
+
+    test "run/1 will return a trie containing that word", context do
+      with %{state: state} <- context do
+        result = @subject.run(state)
+        assert result === %{c: %{a: %{t: %{a: %{c: %{o: %{m: %{b: %{value: "catacomb"}}}}}}}}}
       end
     end
   end

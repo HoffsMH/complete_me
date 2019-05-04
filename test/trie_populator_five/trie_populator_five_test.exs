@@ -192,24 +192,50 @@ defmodule TriePopulatorFiveTest do
     test "run/1 will return a trie containing those words", context do
       with %{state: state} <- context do
         result = @subject.run(state)
-        assert result ===  %{c: %{a: %{t: %{a: %{c: %{o: %{m: %{b: %{value: "catacomb"}}}, l: %{y: %{s: %{m: %{value: "cataclysm"}}}}}}}}}}
+
+        assert result === %{
+                 c: %{
+                   a: %{
+                     t: %{
+                       a: %{
+                         c: %{
+                           o: %{m: %{b: %{value: "catacomb"}}},
+                           l: %{y: %{s: %{m: %{value: "cataclysm"}}}}
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
       end
     end
   end
 
   describe "basic use case with medium word list" do
-    test "populates" do
+    test "populates, each word in the file is findable on the list" do
       with words <- medium_word_list(),
            result <- @subject.populate(words) do
-
-        assert result[:v][:e][:t][:u][:s][:t][:value] === "vetust"
-        assert result[:f][:a][:s][:t][:h][:o][:l][:d][:value] === "fasthold"
+        medium_word_list()
+        |> String.split("\n")
+        |> Enum.each(fn word ->
+          assert find_word(word, result) === word
+        end)
       end
     end
-
   end
 
   def medium_word_list do
     File.read!("./test/support/fixtures/medium.txt")
+  end
+
+  def find_word(word, trie) do
+    keys =
+      String.graphemes(word)
+      |> Enum.map(&String.to_atom/1)
+
+    (keys ++ [:value])
+    |> Enum.reduce(trie, fn key, sub_trie ->
+      sub_trie[key]
+    end)
   end
 end

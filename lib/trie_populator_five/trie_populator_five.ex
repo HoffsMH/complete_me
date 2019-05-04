@@ -15,7 +15,6 @@ defmodule TriePopulatorFive do
             jobs: [],
             job_limit: @default_job_limit
 
-
   def populate(words \\ "")
 
   def populate(words_text) when is_binary(words_text) do
@@ -25,8 +24,8 @@ defmodule TriePopulatorFive do
 
   def populate(word_list) when is_list(word_list) do
     run(%TriePopulatorFive{
-          words: word_list
-        })
+      words: word_list
+    })
   end
 
   # when all jobs are done and there are no more words and only a single trie
@@ -44,7 +43,6 @@ defmodule TriePopulatorFive do
   def run(%{words: [], jobs: jobs} = state)
       when length(jobs) > 0,
       do: harvest_jobs(state)
-
 
   # if there are more than one tries left in tries then make jobs to merge them
   def run(%{tries: [trie1, trie2 | rest], jobs: jobs} = state) do
@@ -80,10 +78,10 @@ defmodule TriePopulatorFive do
     # end
 
     run(%TriePopulatorFive{
-          state |
-          words: rest,
-          tries: state.tries ++ [finish_trie(word, history)]
-        })
+      state
+      | words: rest,
+        tries: state.tries ++ [finish_trie(word, history)]
+    })
   end
 
   def split_states(%{history: history, words: [word | rest]} = state) do
@@ -91,7 +89,6 @@ defmodule TriePopulatorFive do
 
     # split_states
     # history
-
 
     # with next_character <- Enum.at(to_charlist(word1), length(history)),
     #      prefix <- history ++ [next_character] do
@@ -101,8 +98,7 @@ defmodule TriePopulatorFive do
     # {state}
   end
 
-  def split_states(%{words: [word | rest] }, split) do
-
+  def split_states(%{words: [word | rest]}, split) do
     # if the word begins with the prefix put in the split state and recurse
     # if the word doesn't begin witht he prefix return a tuple of both states
 
@@ -119,10 +115,10 @@ defmodule TriePopulatorFive do
       |> Enum.map(&Task.await/1)
 
     run(%{
-          state
-          | tries: new_tries ++ state.tries,
-          jobs: []
-        })
+      state
+      | tries: new_tries ++ state.tries,
+        jobs: []
+    })
   end
 
   def multiple_subwords?(%{history: history, words: [word1, word2 | _]}) do

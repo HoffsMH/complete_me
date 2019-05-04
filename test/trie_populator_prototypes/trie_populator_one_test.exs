@@ -1,6 +1,6 @@
 defmodule TriePopulatorTest do
   use ExUnit.Case, async: true
-  @tp TriePopulator
+  @tp TriePopulatorOne
 
   test "populate with nothing" do
     assert @tp.populate() === %{}

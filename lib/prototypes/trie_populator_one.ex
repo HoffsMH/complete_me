@@ -1,4 +1,4 @@
-defmodule TriePopulator do
+defmodule TriePopulatorOne do
   @ti TrieInserter
 
   def populate(words \\ "")

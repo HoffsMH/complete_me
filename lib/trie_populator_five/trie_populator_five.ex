@@ -1,5 +1,5 @@
 defmodule TriePopulatorFive do
-  @default_job_limit 4
+  @default_job_limit 20
 
   @type t :: %__MODULE__{
           history: charlist,
@@ -14,6 +14,20 @@ defmodule TriePopulatorFive do
             words: [],
             jobs: [],
             job_limit: @default_job_limit
+
+
+  def populate(words \\ "")
+
+  def populate(words_text) when is_binary(words_text) do
+    String.split(words_text, "\n")
+    |> populate
+  end
+
+  def populate(word_list) when is_list(word_list) do
+    run(%TriePopulatorFive{
+          words: word_list
+        })
+  end
 
   # when all jobs are done and there are no more words and only a single trie
   # remains in trie list its time to actually return the final trie
@@ -44,11 +58,59 @@ defmodule TriePopulatorFive do
   end
 
   def run(%{history: history, words: [word | rest]} = state) do
+    # if multiple_subwords?(state) do
+    #   with {main_state, split_state} <- split_states(state) do
+    #     run(%TriePopulatorFive{
+    #           main_state |
+    #           jobs: main_state.jobs ++ [
+    #             Task.async(fn ->
+    #               run(split_state)
+    #             end)
+    #           ]
+
+    #         }
+    #     )
+    #   else
+    #     run(%TriePopulatorFive{
+    #           state |
+    #           words: rest,
+    #           tries: state.tries ++ [finish_trie(word, history)]
+    #         })
+    #   end
+    # end
+
     run(%TriePopulatorFive{
           state |
           words: rest,
           tries: state.tries ++ [finish_trie(word, history)]
         })
+  end
+
+  def split_states(%{history: history, words: [word | rest]} = state) do
+    # determine the full prefix for future iterations
+
+    # split_states
+    # history
+
+
+    # with next_character <- Enum.at(to_charlist(word1), length(history)),
+    #      prefix <- history ++ [next_character] do
+    #   split_states(state, )
+    # end
+
+    # {state}
+  end
+
+  def split_states(%{words: [word | rest] }, split) do
+
+    # if the word begins with the prefix put in the split state and recurse
+    # if the word doesn't begin witht he prefix return a tuple of both states
+
+    # split_states(%TriePopulatorFive{
+    #       main |
+    #       words: rest
+
+    #              })
   end
 
   def harvest_jobs(%{jobs: jobs} = state) do
@@ -70,7 +132,7 @@ defmodule TriePopulatorFive do
     end
   end
 
-  def multiple_subwords?(%{words: [word]}), do: false
+  def multiple_subwords?(%{words: [_]}), do: false
 
   def finish_trie(word, history) when word == history, do: %{value: to_string(word)}
 

@@ -196,4 +196,20 @@ defmodule TriePopulatorFiveTest do
       end
     end
   end
+
+  describe "basic use case with medium word list" do
+    test "populates" do
+      with words <- medium_word_list(),
+           result <- @subject.populate(words) do
+
+        assert result[:v][:e][:t][:u][:s][:t][:value] === "vetust"
+        assert result[:f][:a][:s][:t][:h][:o][:l][:d][:value] === "fasthold"
+      end
+    end
+
+  end
+
+  def medium_word_list do
+    File.read!("./test/support/fixtures/medium.txt")
+  end
 end

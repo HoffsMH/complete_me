@@ -179,4 +179,21 @@ defmodule TriePopulatorFiveTest do
       end
     end
   end
+
+  describe "when there are multiple words" do
+    setup do
+      state = %TriePopulatorFive{
+        words: ["catacomb", "cataclysm"]
+      }
+
+      {:ok, state: state}
+    end
+
+    test "run/1 will return a trie containing those words", context do
+      with %{state: state} <- context do
+        result = @subject.run(state)
+        assert result ===  %{c: %{a: %{t: %{a: %{c: %{o: %{m: %{b: %{value: "catacomb"}}}, l: %{y: %{s: %{m: %{value: "cataclysm"}}}}}}}}}}
+      end
+    end
+  end
 end

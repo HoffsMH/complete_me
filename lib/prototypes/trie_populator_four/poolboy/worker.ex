@@ -9,7 +9,7 @@ defmodule TriePopulatorFour.Worker do
     {:ok, nil}
   end
 
-  def handle_call({merge_and_load, [a, b]}, _from, state) do
+  def handle_call({:merge_and_load, [a, b]}, _from, state) do
     TriePopulatorFour.merge_and_load(a, b)
     {:reply, state, state}
   end

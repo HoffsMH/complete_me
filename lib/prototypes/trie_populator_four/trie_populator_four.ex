@@ -37,32 +37,12 @@ defmodule TriePopulatorFour do
     GenServer.call(__MODULE__, {:done_inserting}, :infinity)
   end
 
-  def handle_call({:done_inserting}, _from, state) do
-    {:reply, :ok, %{state | doneInserting: true}}
-  end
-
-  def handle_call({:first_two_tries}, _from, state) do
-    cond do
-      length(state.tries) > 1 ->
-        [a, b | new_tries] = state.tries
-        {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
-
-      state.doneInserting ->
-        {:reply, {:done}, state}
-
-      true ->
-        {:reply, {:empty, []}, state}
-    end
-  end
-
   def start_combining do
     spawn_monitor(__MODULE__, :combine, [])
   end
 
   def combine do
     with {:success, [a, b]} <- pull_out_first_two() do
-      # Task.async(__MODULE__, :merge_and_load, [a, b])
-
       :poolboy.transaction(
         :worker,
         fn pid -> GenServer.call(pid, {:merge_and_load, [a, b]}) end,
@@ -118,6 +98,24 @@ defmodule TriePopulatorFour do
       {:reply, state, state}
     else
       {:reply, hd(state.tries), state}
+    end
+  end
+
+  def handle_call({:done_inserting}, _from, state) do
+    {:reply, :ok, %{state | doneInserting: true}}
+  end
+
+  def handle_call({:first_two_tries}, _from, state) do
+    cond do
+      length(state.tries) > 1 ->
+        [a, b | new_tries] = state.tries
+        {:reply, {:success, [a, b]}, %{state | tries: new_tries}}
+
+      state.doneInserting ->
+        {:reply, {:done}, state}
+
+      true ->
+        {:reply, {:empty, []}, state}
     end
   end
 end

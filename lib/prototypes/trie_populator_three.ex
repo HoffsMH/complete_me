@@ -56,6 +56,14 @@ defmodule TriePopulatorThree do
     end
   end
 
+  def handle_call({:first_trie}, _from, state) do
+    if length(state.tries) === 0 do
+      {:reply, state, state}
+    else
+      {:reply, hd(state.tries), state}
+    end
+  end
+
   def start_combining do
     spawn_monitor(__MODULE__, :combine, [])
   end
@@ -105,13 +113,5 @@ defmodule TriePopulatorThree do
 
   def get_first_trie do
     GenServer.call(__MODULE__, {:first_trie}, :infinity)
-  end
-
-  def handle_call({:first_trie}, _from, state) do
-    if length(state.tries) === 0 do
-      {:reply, state, state}
-    else
-      {:reply, hd(state.tries), state}
-    end
   end
 end

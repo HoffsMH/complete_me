@@ -107,7 +107,7 @@ defmodule TriePopulatorFive do
     end
   end
 
-  def split_states(%{history: history, words: [word | rest]} = state) do
+  def split_states(%{history: history, words: [word | _rest]} = state) do
     with next_character <- Enum.at(to_charlist(word), length(history)),
          split_history <- history ++ [next_character],
          split_state <- %TriePopulatorFive{history: split_history} do
@@ -118,7 +118,7 @@ defmodule TriePopulatorFive do
   def split_states(%{words: []} = main_state, split_state), do: {:ok, main_state, split_state}
 
   def split_states(
-        %{words: [word | rest] = words} = main_state,
+        %{words: [word | rest]} = main_state,
         %{history: split_history} = split_state
       ) do
     if List.starts_with?(to_charlist(word), split_history) do

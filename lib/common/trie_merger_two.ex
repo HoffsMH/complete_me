@@ -2,12 +2,10 @@ defmodule TrieMergerTwo do
   def merge(nil, trie), do: trie
 
   def merge(trie_one, trie_two) when is_map(trie_two) do
-      trie_two
-      |> Enum.map(
-    &(Task.async(fn -> merge_keys(&1, trie_one) end))
-      )
-      |> Enum.map(&Task.await/1)
-      |> Enum.reduce(%{}, &Map.merge/2)
+    trie_two
+    |> Enum.map(&Task.async(fn -> merge_keys(&1, trie_one) end))
+    |> Enum.map(&Task.await/1)
+    |> Enum.reduce(%{}, &Map.merge/2)
   end
 
   def merge(trie_one, trie_two)

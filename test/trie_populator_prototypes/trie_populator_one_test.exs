@@ -1,4 +1,4 @@
-defmodule TriePopulatorTest do
+defmodule TriePopulatorOneTest do
   use ExUnit.Case, async: true
   @tp TriePopulatorOne
 

@@ -1,10 +1,43 @@
 # Find the fastest way to populate a trie of words (using Elixir's awesome concurrency model)
 
-[Tries Wikipedia Article](https://en.wikipedia.org/wiki/Trie)
-These datastructures can be used for autocomplete but this project quickly turned into producing many different prototypes that could be used
+## Backstory
+This started off as some programming practice and programming language discovery.I started this repo when I was almost brand new to elixir. I decided to use an assignment from my old bootcamp. see [Assignment](#assignment-completeme).
+
+After messing with Elixir concurrency my focus quickly strayed away from working on the suggestion mechanism and more toward seeing how I could use concurrency to build
+the main data structure of the project, a [trie](https://en.wikipedia.org/wiki/Trie) as quickly as possible. The prototypes directory have my first 5 attempts and I had fun learning along the way.
+
+First versions with concurrency involved building separate "machine" processes that did things one at a time and passed their product on to another "machine". Later on,
+since the datastructure is basically tree-like I experimented with branching processes. see [TriePopulatorFive](https://github.com/HoffsMH/complete_me/blob/master/lib/prototypes/trie_populator_five/trie_populator_five.ex)
+
+Eventually I
+
+final version is simple
 
 
-# CompleteMe
+future optimizations
+map and inserting smartly
+
+
+### Lessons learned
+#### It can be hard to tell when you are "done"
+#### Processes cheap but not free
+#### the memory taken up by a single process is important to pay attention to
+
+### more processes dont always improve performance
+### ratio between merge and insert
+
+## See it for yourself
+### Tests
+### Running in iex
+#### viewing the data-structure
+### Benchmarking
+how to run
+how to manipulate the benchmark file
+different input sizes
+
+
+
+# Assignment: CompleteMe
 [from turing project page](http://backend.turing.io/module1/projects/complete_me)
 
 Everyone in today’s smartphone-saturated world has had their share of interactions with textual “autocomplete.” You may have sometimes even wondered if autocomplete is worth the trouble, given the ridiculous completions it sometimes attempts.

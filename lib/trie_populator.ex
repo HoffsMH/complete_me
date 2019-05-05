@@ -20,7 +20,7 @@ defmodule TriePopulator do
       |> Enum.chunk_every(portion_size)
       |> Enum.map(&build_trie_job/1)
       |> Enum.map(&Task.await/1)
-      |> Enum.reduce(%{}, &TrieMerger.merge(&1, &2))
+      |> merge_tries()
     end
   end
 
@@ -35,14 +35,8 @@ defmodule TriePopulator do
     end)
   end
 
-  def merge_trie(trie_list) do
+  def merge_tries(trie_list) do
     trie_list
     |> Enum.reduce(%{}, &TrieMerger.merge(&1, &2))
-  end
-
-  def merge_trie_job(trie_list) do
-    Task.async(fn ->
-      merge_trie(trie_list)
-    end)
   end
 end

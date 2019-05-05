@@ -26,10 +26,81 @@ defmodule TriePopulatorTest do
     end
   end
 
+  describe "edge cases" do
+    test "when given empty string returns a blank trie" do
+      with result <- @subject.populate("") do
+        assert result === %{}
+      end
+    end
+
+    test "when given no arguments returns a blank trie" do
+      with result <- @subject.populate() do
+        assert result === %{}
+      end
+    end
+
+    test "when given no arguments for portions and max portion size" do
+      with result <- @subject.populate("adfasdfasdfasdf") do
+        assert result === %{
+                 a: %{
+                   d: %{
+                     f: %{
+                       a: %{
+                         s: %{
+                           d: %{
+                             f: %{
+                               a: %{
+                                 s: %{
+                                   d: %{f: %{a: %{s: %{d: %{f: %{value: "adfasdfasdfasdf"}}}}}}
+                                 }
+                               }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               },
+               "still valiantly forms the trie!"
+      end
+    end
+
+    test """
+    when given no arguments for max and an impossible argument for portions
+    """ do
+      with result <- @subject.populate("adfasdfasdfasdf", 20_000) do
+        assert result === %{
+                 a: %{
+                   d: %{
+                     f: %{
+                       a: %{
+                         s: %{
+                           d: %{
+                             f: %{
+                               a: %{
+                                 s: %{
+                                   d: %{f: %{a: %{s: %{d: %{f: %{value: "adfasdfasdfasdf"}}}}}}
+                                 }
+                               }
+                             }
+                           }
+                         }
+                       }
+                     }
+                   }
+                 }
+               },
+               "still valiantly forms the trie!"
+      end
+    end
+  end
+
   describe "basic use case with medium word list" do
     test "populates: each word in the file is findable on the list" do
       with words <- medium_word_list(),
            result <- @subject.populate(words) do
+        # each word on list is findable within the trie
         medium_word_list()
         |> String.split("\n")
         |> Enum.reject(&(&1 === ""))

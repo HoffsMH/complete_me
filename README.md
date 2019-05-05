@@ -1,4 +1,10 @@
-# CompleteMe 
+# Find the fastest way to populate a trie of words (using Elixir's awesome concurrency model)
+
+[Tries Wikipedia Article](https://en.wikipedia.org/wiki/Trie)
+These datastructures can be used for autocomplete but this project quickly turned into producing many different prototypes that could be used
+
+
+# CompleteMe
 [from turing project page](http://backend.turing.io/module1/projects/complete_me)
 
 Everyone in today’s smartphone-saturated world has had their share of interactions with textual “autocomplete.” You may have sometimes even wondered if autocomplete is worth the trouble, given the ridiculous completions it sometimes attempts.
@@ -40,4 +46,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/complete_me](https://hexdocs.pm/complete_me).
-

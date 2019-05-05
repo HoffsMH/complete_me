@@ -1,6 +1,6 @@
 defmodule CompleteMe do
   @ti TrieInserter
-  @tp TriePopulatorOne
+  @tp TriePopulator
   @ts TrieSuggestion
 
   def count, do: 0

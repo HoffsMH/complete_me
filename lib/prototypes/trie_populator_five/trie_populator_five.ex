@@ -1,6 +1,5 @@
 defmodule TriePopulatorFive do
   @default_job_limit 4
-
   @type t :: %__MODULE__{
           history: charlist,
           tries: [map],
@@ -8,6 +7,11 @@ defmodule TriePopulatorFive do
           jobs: [Task.Async.t()],
           job_limit: integer
         }
+  @moduledoc """
+  populate/1 will eventually call run/1 which will recurse until a single trie is formed.
+
+  run/1 only accepts a %TriePopulatorFive state struct and will return only a %TriePopulatorFive or a final trie
+  """
 
   defstruct history: '',
             tries: [],
@@ -34,6 +38,7 @@ defmodule TriePopulatorFive do
       when length(tries) == 1,
       do: List.first(tries)
 
+  # when the job list is full use the current process to insert words sequentially
   def run(
         %{
           history: history,
@@ -60,11 +65,14 @@ defmodule TriePopulatorFive do
       when length(jobs) >= job_limit,
       do: harvest_jobs(state)
 
+  # if there are jobs but no more words to work on its time to harvest all the remaining jobs
   def run(%{words: [], jobs: jobs} = state)
       when length(jobs) > 0,
       do: harvest_jobs(state)
 
   # if there are more than one tries left in tries then make jobs to merge them
+  # Note that we dont have to use recursive merge here since we can be sure that
+  # Any trie we get back will be complete
   def run(%{tries: [trie1, trie2 | rest], jobs: jobs} = state) do
     new_state = %TriePopulatorFive{
       state
@@ -75,6 +83,11 @@ defmodule TriePopulatorFive do
     run(new_state)
   end
 
+  # if there are multiple subwords of the first word such as words: [arm, armistice]
+  # we group together all words that are a sub word of the first word together and start
+  # a job.
+  # otherwise if its a single word that has no following sub words we use the
+  # current process to form its trie and add it to the state for the next iteration
   def run(%{history: history, words: [word | rest]} = state) do
     if multiple_subwords?(state) do
       with {:ok, main_state, split_state} <- split_states(state) do

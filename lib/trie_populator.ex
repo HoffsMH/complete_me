@@ -43,7 +43,7 @@ defmodule TriePopulator do
     |> Enum.reduce(%{}, &TrieMerger.merge(&1, &2))
   end
 
-  def determine_portion_size(word_list, portions) do
+  def determine_portion_size(word_list, portions) when portions != 0 do
     round(Float.ceil(length(word_list) / portions))
   end
 end

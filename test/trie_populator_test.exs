@@ -26,6 +26,23 @@ defmodule TriePopulatorTest do
     end
   end
 
+  describe "determine_portion_size/2" do
+    test "when given arguments that should otherwise cause output to be 0" do
+      with result <- @subject.determine_portion_size(["a"], 20) do
+        assert result === 1
+      end
+    end
+
+    test "when given 0 as a portions arg" do
+      assert_raise(
+        FunctionClauseError,
+        fn ->
+          @subject.determine_portion_size(["a"], 0)
+        end
+      )
+    end
+  end
+
   describe "edge cases" do
     test "when given empty string returns a blank trie" do
       with result <- @subject.populate("") do

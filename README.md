@@ -1,9 +1,8 @@
 # Find the fastest way to populate a trie of words (using Elixir's awesome concurrency)
 
-This started off as some programming practice and programming language discovery. I started this project brand new to elixir and worked on it on and off in my spare time. It started as an interest in an assignment from my old bootcamp. see [Assignment](#assignment-completeme).
+This started off as some programming practice and programming language discovery. I started this project relatively new to elixir and worked on it on and off in my spare time. It started as an interest in an assignment from my old coding bootcamp. see [Assignment](#assignment-completeme).
 
-After messing with Elixir concurrency my focus quickly strayed away from working on the suggestion mechanism of the assignment and more toward seeing how I could use concurrency to build
-the main data structure of the project, a [trie](https://en.wikipedia.org/wiki/Trie) as quickly as possible. The [prototypes](https://github.com/HoffsMH/complete_me/tree/master/lib/prototypes) directory has the first 5 versions of my [TriePopulator](https://github.com/HoffsMH/complete_me/blob/master/lib/trie_populator.ex) and I had fun learning along the way!
+After getting the initial version running my focus quickly strayed away from working on the suggestion mechanism of the assignment and more toward seeing how I could use concurrency to build the main data structure of the project, a [trie](https://en.wikipedia.org/wiki/Trie), as quickly as possible. The [prototypes](https://github.com/HoffsMH/complete_me/tree/master/lib/prototypes) directory has the first 5 versions of my [TriePopulator](https://github.com/HoffsMH/complete_me/blob/master/lib/trie_populator.ex) and I had fun learning along the way!
 
 The first versions involved building separate "machine" processes that did things one at a time and passed their product on to another "machine".
 
@@ -80,7 +79,7 @@ Sure its not that much of a problem to spawn `10_000` processes if each one is e
 #### There is a ratio to keep between expensive and cheap operations, rather than just attempting to do everything in paralell.
 Attempting to make 250k separate tries for each word is something like 250k * the length of the average word in terms of map writes. Then when merging them
 you have to perform basically the exact same set of of 250k words worth of map writes again. So even though there is an advantage to doing things this way in that you
-can do all of these writes in paralell, the total operation still performs much more poorly than just creating a single trie word by word within a single process because you have basically doubled your most expensive operation. And at the end of the day you don't have 1k cpu cores at your disposal :(
+can do all of these writes in paralell, the total operation still performs much more poorly than just creating a single trie, word by word, within a single process because you have basically doubled your most expensive operation. And at the end of the day you don't have 1k cpu cores at your disposal :(
 
 I guess If I had to abstract this lesson into something more general: sometimes it might be possible to paralellize a task at the cost of adding a more total work, special attention needs to be payed to how much extra work is actually being generated.
 
